@@ -9,6 +9,7 @@ const $ = require("gulp-load-plugins")() //引入gulp-load-plugins
 const config = require('./config/index')
 $.autoprefixer = require('gulp-autoprefixer');
 $.imagemin = require('gulp-imagemin');
+$.fileinclude = require('gulp-file-include');
 console.log($, 9999)
 
 // 第三方库资源
@@ -43,6 +44,11 @@ const imageTask = function () {
 // html
 const htmlTask = function () {
   return src(`${config.src}/views/**/*.html`)
+    .pipe($.fileinclude({
+      prefix: '@@', //变量前缀 @@include
+      basepath: `${config.src}/templates`, //引用文件路径
+      indent: true //保留文件的缩进
+    }))
     .pipe(dest(`${config.dist}/`));
 }
 
@@ -58,24 +64,27 @@ const serverTask = function () {
 // 刷新
 const reloadTask = function () {
   return src(`${config.src}/views/**/*.html`) //指定源文件
-    .pipe(dest(config.dist)) //拷贝到dist目录
+    .pipe($.fileinclude({
+      prefix: '@@', //变量前缀 @@include
+      basepath: `${config.src}/templates`, //引用文件路径
+      indent: true //保留文件的缩进
+    }))
+    .pipe(dest(`${config.dist}/`)) //拷贝到dist目录
     .pipe($.connect.reload()) //通知浏览器重启
 }
 
 // 监控文件改动
-const watchTask = function(cb) {
+const watchTask = function () {
   // lib
-  watch(`${config.src}/lib/**/*`, series(libTask))
+  watch(`${config.src}/lib/**/*`, series(libTask, reloadTask))
   // js
-  watch(`${config.src}/assets/js/**/*.js`, series(jsTask))
+  watch(`${config.src}/assets/js/**/*.js`, series(jsTask, reloadTask))
   // css
-  watch(`${config.src}/assets/css/**/*.css`, series(cssTask))
+  watch(`${config.src}/assets/css/**/*.css`, series(cssTask, reloadTask))
   // image
-  watch(`${config.src}/assets/images/**/*.{jpg,png,JPG,PNG}`, series(imageTask))
+  watch(`${config.src}/assets/images/**/*.{jpg,png,JPG,PNG}`, series(imageTask, reloadTask))
   // html
-  watch(`${config.src}/views/**/*.html`, series(htmlTask))
-
-  cb()
+  watch([`${config.src}/views/**/*.html`], reloadTask)
 }
 
 // 清除目标文件夹：  gulp-clean
@@ -84,8 +93,7 @@ const cleanTask = function () {
     .pipe($.clean()) //执行清除
 }
 
-const defaultTask = series(libTask, imageTask, htmlTask);
+const defaultTask = series(libTask, parallel(cssTask, jsTask, imageTask), htmlTask);
 exports.default = defaultTask;
-exports.server = series(defaultTask, parallel(serverTask, reloadTask, watchTask))
-
-// exports.build = series(cleanTask, libTask, imageTask, htmlTask);
+exports.server = series(defaultTask, parallel(serverTask, watchTask), reloadTask);
+exports.build = series(cleanTask, defaultTask);
