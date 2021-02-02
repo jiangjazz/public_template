@@ -1,11 +1,11 @@
 {
   "name": "mulhtml_gulp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "html by gulp",
   "main": "gulpfile.js",
   "scripts": {
-    "dev": "gulp server",
-    "build": "gulp build"
+    "dev": "cross-env NODE_ENV=development gulp server",
+    "build": "cross-env NODE_ENV='production' gulp build"
   },
   "keywords": [
     "gulp",
@@ -15,6 +15,7 @@
   "author": "jazz",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
     "gulp-clean-css": "^4.3.0",
@@ -27,5 +28,8 @@
     "gulp-load-plugins": "^2.0.6",
     "gulp-rename": "^2.0.0",
     "gulp-uglify": "^3.0.2"
+  },
+  "dependencies": {
+    "gulp-clean": "^0.4.0"
   }
 }

@@ -10,7 +10,7 @@ const config = require('./config/index')
 $.autoprefixer = require('gulp-autoprefixer');
 $.imagemin = require('gulp-imagemin');
 $.fileinclude = require('gulp-file-include');
-console.log($, 9999)
+$.clean = require('gulp-clean');
 
 // 第三方库资源
 const libTask = function () {
@@ -89,7 +89,7 @@ const watchTask = function () {
 
 // 清除目标文件夹：  gulp-clean
 const cleanTask = function () {
-  return src(config.dist) //清除的文件夹
+  return src(config.dist, { allowEmpty: true }) //清除的文件夹
     .pipe($.clean()) //执行清除
 }
 
