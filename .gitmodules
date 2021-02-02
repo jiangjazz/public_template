@@ -1,0 +1,6 @@
+[submodule "granular-spa"]
+	path = granular-spa
+	url = git@github.com:jiangjazz/granular-spa.git
+[submodule "nuxt_demo"]
+	path = nuxt_demo
+	url = git@github.com:jiangjazz/nuxt_demo.git
